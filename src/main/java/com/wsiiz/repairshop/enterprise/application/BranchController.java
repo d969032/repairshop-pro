@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 
     @RestController
     @RequestMapping("/branches")
+    //@RestController
+    //@RequestMapping("api/security/user-accounts")
     public class BranchController {
 
         private final BranchService branchService;
