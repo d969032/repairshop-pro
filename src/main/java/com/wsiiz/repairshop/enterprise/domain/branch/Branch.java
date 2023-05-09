@@ -1,9 +1,10 @@
 package com.wsiiz.repairshop.enterprise.domain.branch;
 
+import com.wsiiz.repairshop.enterprise.domain.employee.Employee;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-//poprawka_2
+
 @Entity
 public class Branch {
     @Id
@@ -27,6 +28,14 @@ public class Branch {
 
     @OneToMany(mappedBy = "parentBranch", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Branch> childBranches = new ArrayList<>();
+
+    public Branch() {}
+
+    public Branch(String name, Address address, BranchType branchType) {
+        this.name = name;
+        this.address = address;
+        this.branchType = branchType;
+    }
 
     public Long getId() {
         return id;
@@ -83,40 +92,37 @@ public class Branch {
     public void setChildBranches(List<Branch> childBranches) {
         this.childBranches = childBranches;
     }
+
+    public void addChildBranch(Branch childBranch) {
+        childBranch.setParentBranch(this);
+        childBranches.add(childBranch);
+    }
+
+    public void removeChildBranch(Branch childBranch) {
+        childBranch.setParentBranch(null);
+        childBranches.remove(childBranch);
+    }
+
+    public void addEmployee(Employee employee) {
+        employee.setBranch(this);
+        employees.add(employee);
+    }
+
+    public void removeEmployee(Employee employee) {
+        employee.setBranch(null);
+        employees.remove(employee);
+    }
 }
-@Embeddable
-public class Address {
-    private String city;
-
-    private String street;
-
-    private String zipCode;
-
-    // getters and setters
-}
-
 public enum BranchType {
     SERVICE,
     SALES,
-    MIXED
+    MIXED;
 }
-
-public enum EmployeeType {
-    MECHANIC,
-    SALES_PERSON,
-    OFFICE_WORKER,
-    HELPER,
-    MANAGER,
-    ADVISOR
-}
-
-public enum EmployeeSkill {
+public enum ServiceType {
     ELECTRONICS,
     MECHANICS,
     HYDRAULICS,
     ELECTRICAL_INSTALLATION,
     CAR_BODY,
-    PAINTING,
-    CUSTOMER_SERVICE,
-    SALES
+    PAINTING;
 }
