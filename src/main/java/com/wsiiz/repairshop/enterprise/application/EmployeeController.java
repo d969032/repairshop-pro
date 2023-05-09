@@ -1,52 +1,27 @@
-package com.wsiiz.repairshop.enterprise.application;
+package com.wsiiz.repairshop.enterprise.application.employee;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import com.wsiiz.repairshop.enterprise.domain.branch.Branch;
+import com.wsiiz.repairshop.enterprise.domain.employee.Employee;
+import com.wsiiz.repairshop.enterprise.domain.employee.EmployeeRepository;
 
-@RestController
-@RequestMapping("/employees")
+import java.util.Set;
+
 public class EmployeeController {
 
-    private final EmployeeService employeeService;
+    private final EmployeeRepository employeeRepository;
 
-    public EmployeeController(EmployeeService employeeService) {
-        this.employeeService = employeeService;
+    public EmployeeController(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
     }
 
-    @GetMapping("/{employeeId}")
-    public ResponseEntity<EmployeeDto> getEmployee(@PathVariable Long employeeId) {
-        EmployeeDto employee = employeeService.getEmployee(employeeId);
-        if (employee == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(employee);
+    public void assignEmployeeToBranch(Long employeeId, Long branchId) {
+        Employee employee = employeeRepository.findById(employeeId);
+        Branch branch = branchRepository.findById(branchId);
+        employee.setBranch(branch);
+        employeeRepository.save(employee);
     }
 
-    @PostMapping
-    public ResponseEntity<EmployeeDto> addEmployee(@RequestBody EmployeeDto employeeDto) {
-        EmployeeDto savedEmployee = employeeService.saveEmployee(employeeDto);
-        if (savedEmployee == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(savedEmployee);
-    }
-
-    @DeleteMapping("/{employeeId}")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable Long employeeId) {
-        boolean success = employeeService.deleteEmployee(employeeId);
-        if (!success) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping
-    public ResponseEntity<List<EmployeeDto>> getEmployeesByBranchId(
-            @RequestParam(name = "branchId", required = true) Long branchId) {
-        List<EmployeeDto> employees = employeeService.getEmployeesByBranchId(branchId);
-        if (employees == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(employees);
+    public Set<Employee> getAllEmployees() {
+        return employeeRepository.findAll();
     }
 }

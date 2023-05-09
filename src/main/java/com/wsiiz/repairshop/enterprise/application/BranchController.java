@@ -1,48 +1,47 @@
-package com.wsiiz.repairshop.enterprise.application;
+package com.wsiiz.repairshop.enterprise.application.branch;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.wsiiz.repairshop.enterprise.domain.branch.Branch;
+import com.wsiiz.repairshop.enterprise.domain.branch.BranchRepository;
+import com.wsiiz.repairshop.enterprise.domain.employee.EmployeeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-    @RestController
-    @RequestMapping("/branches")
-    //@RestController
-    //@RequestMapping("api/security/user-accounts")
-    public class BranchController {
+@RestController
+@RequestMapping("/branches")
+public class BranchController {
 
-        private final BranchService branchService;
+    @Autowired
+    private BranchRepository branchRepository;
 
-        public BranchController(BranchService branchService) {
-            this.branchService = branchService;
-        }
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
-        @GetMapping
-        public ResponseEntity<List<BranchDTO>> getAllBranches(@RequestParam(required = false) String city,
-                                                              @RequestParam(required = false) Long parentId) {
-            List<BranchDTO> branches = branchService.getAllBranches(city, parentId);
-            return ResponseEntity.ok(branches);
-        }
-
-        @GetMapping("/{id}")
-        public ResponseEntity<BranchDTO> getBranchById(@PathVariable Long id) {
-            BranchDTO branch = branchService.getBranchById(id);
-            if (branch == null) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.ok(branch);
-        }
-
-        @PostMapping
-        public ResponseEntity<BranchDTO> addBranch(@RequestBody BranchDTO branchDTO) {
-            BranchDTO createdBranch = branchService.addBranch(branchDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdBranch);
-        }
-
-        @DeleteMapping("/{id}")
-        public ResponseEntity<Void> deleteBranch(@PathVariable Long id) {
-            branchService.deleteBranch(id);
-            return ResponseEntity.noContent().build();
-        }
+    @GetMapping("/{id}")
+    public Branch getBranchById(@PathVariable Long id) {
+        return branchRepository.findById(id).orElse(null);
     }
 
+    @PostMapping
+    public Branch createBranch(@RequestBody Branch branch) {
+        return branchRepository.save(branch);
+    }
 
+    @PutMapping("/{id}")
+    public Branch updateBranch(@PathVariable Long id, @RequestBody Branch branch) {
+        Branch existingBranch = branchRepository.findById(id).orElse(null);
+        if (existingBranch != null) {
+            existingBranch.setName(branch.getName());
+            existingBranch.setAddress(branch.getAddress());
+            existingBranch.setBranchType(branch.getBranchType());
+            existingBranch.getEmployees().clear();
+            existingBranch.getEmployees().addAll(branch.getEmployees());
+            return branchRepository.save(existingBranch);
+        }
+        return null;
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteBranch(@PathVariable Long id) {
+        branchRepository.deleteById(id);
+    }
+}

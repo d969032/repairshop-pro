@@ -1,35 +1,16 @@
 package com.wsiiz.repairshop.enterprise.domain.branch;
 
 import com.wsiiz.repairshop.enterprise.domain.employee.Employee;
-import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
-@Entity
+import java.util.HashSet;
+import java.util.Set;
+
 public class Branch {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     private String name;
-
-    @Embedded
     private Address address;
-
-    @Enumerated(EnumType.STRING)
     private BranchType branchType;
-
-    @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Employee> employees = new ArrayList<>();
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_branch_id")
-    private Branch parentBranch;
-
-    @OneToMany(mappedBy = "parentBranch", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<Branch> childBranches = new ArrayList<>();
-
-    public Branch() {}
+    private Set<Employee> employees = new HashSet<>();
 
     public Branch(String name, Address address, BranchType branchType) {
         this.name = name;
@@ -37,92 +18,59 @@ public class Branch {
         this.branchType = branchType;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Address getAddress() {
         return address;
     }
 
-    public void setAddress(Address address) {
-        this.address = address;
-    }
-
     public BranchType getBranchType() {
         return branchType;
     }
 
-    public void setBranchType(BranchType branchType) {
-        this.branchType = branchType;
-    }
-
-    public List<Employee> getEmployees() {
+    public Set<Employee> getEmployees() {
         return employees;
     }
 
-    public void setEmployees(List<Employee> employees) {
-        this.employees = employees;
-    }
-
-    public Branch getParentBranch() {
-        return parentBranch;
-    }
-
-    public void setParentBranch(Branch parentBranch) {
-        this.parentBranch = parentBranch;
-    }
-
-    public List<Branch> getChildBranches() {
-        return childBranches;
-    }
-
-    public void setChildBranches(List<Branch> childBranches) {
-        this.childBranches = childBranches;
-    }
-
-    public void addChildBranch(Branch childBranch) {
-        childBranch.setParentBranch(this);
-        childBranches.add(childBranch);
-    }
-
-    public void removeChildBranch(Branch childBranch) {
-        childBranch.setParentBranch(null);
-        childBranches.remove(childBranch);
-    }
-
     public void addEmployee(Employee employee) {
-        employee.setBranch(this);
         employees.add(employee);
     }
 
     public void removeEmployee(Employee employee) {
-        employee.setBranch(null);
         employees.remove(employee);
     }
+
 }
-public enum BranchType {
+
+class Address {
+
+    private String street;
+    private String city;
+    private String postalCode;
+
+    public Address(String street, String city, String postalCode) {
+        this.street = street;
+        this.city = city;
+        this.postalCode = postalCode;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+}
+
+enum BranchType {
     SERVICE,
     SALES,
-    MIXED;
-}
-public enum ServiceType {
-    ELECTRONICS,
-    MECHANICS,
-    HYDRAULICS,
-    ELECTRICAL_INSTALLATION,
-    CAR_BODY,
-    PAINTING;
+    MIXED
 }

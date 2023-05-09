@@ -1,106 +1,70 @@
 package com.wsiiz.repairshop.enterprise.domain.employee;
 
 import com.wsiiz.repairshop.enterprise.domain.branch.Branch;
-import jakarta.persistence.*;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
-@Entity
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+
 public class Employee {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     private String firstName;
-
     private String lastName;
-
-    @Enumerated(EnumType.STRING)
-    private EmployeeType employeeType;
-
-    private LocalDate employmentDate;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branch_id")
+    private EmploymentType employmentType;
+    private LocalDate hireDate;
     private Branch branch;
+    private Set<Skill> skills = new HashSet<>();
 
-    @ElementCollection
-    private List<EmployeeSkill> skills = new ArrayList<>();
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    public Employee(String firstName, String lastName, EmploymentType employmentType, LocalDate hireDate, Branch branch, Set<Skill> skills) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.employmentType = employmentType;
+        this.hireDate = hireDate;
+        this.branch = branch;
+        this.skills = skills;
     }
 
     public String getFirstName() {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     public String getLastName() {
         return lastName;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public EmploymentType getEmploymentType() {
+        return employmentType;
     }
 
-    public EmployeeType getEmployeeType() {
-        return employeeType;
-    }
-
-    public void setEmployeeType(EmployeeType employeeType) {
-        this.employeeType = employeeType;
-    }
-
-    public LocalDate getEmploymentDate() {
-        return employmentDate;
-    }
-
-    public void setEmploymentDate(LocalDate employmentDate) {
-        this.employmentDate = employmentDate;
+    public LocalDate getHireDate() {
+        return hireDate;
     }
 
     public Branch getBranch() {
         return branch;
     }
 
-    public void setBranch(Branch branch) {
-        this.branch = branch;
-    }
-
-    public List<EmployeeSkill> getSkills() {
+    public Set<Skill> getSkills() {
         return skills;
-    }
-
-    public void setSkills(List<EmployeeSkill> skills) {
-        this.skills = skills;
     }
 }
 
-enum EmployeeType {
+enum EmploymentType {
     MECHANIC,
-    SALES_PERSON,
+    SALESMAN,
     OFFICE_WORKER,
     HELPER,
     MANAGER,
     ADVISOR
 }
 
-enum EmployeeSkill {
-    ELECTRONICS,
-    MECHANICS,
-    HYDRAULICS,
-    ELECTRICAL_INSTALLATION,
-    CAR_BODY,
+enum Skill {
+    ENGINE_REPAIR,
+    BODY_REPAIR,
     PAINTING,
+    CUSTOMIZATION,
+    SALES,
     CUSTOMER_SERVICE,
-    SALES
+    ADMINISTRATION,
+    CLEANING
 }
